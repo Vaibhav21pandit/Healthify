@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "355677258280",
+    "firebase_url": "https://healthify-c9d96.firebaseio.com",
+    "project_id": "healthify-c9d96",
+    "storage_bucket": "healthify-c9d96.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355677258280:android:46d74742d76467cd9e6b1d",
+        "android_client_info": {
+          "package_name": "com.healthify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "355677258280-o8m0q46k6okbpa9k40avmn2tsgqhd8r2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoUzSf8_GcghN1JxToiGDDbVeGQu4TXWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "355677258280-o8m0q46k6okbpa9k40avmn2tsgqhd8r2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
