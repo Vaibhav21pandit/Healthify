@@ -3,7 +3,8 @@ import {View,Text,FlatList,Image,Dimensions,StyleSheet, InteractionManager } fro
 import { NavigationContainer } from '@react-navigation/native';
 import {StackNavigator} from './Navigation/StackNav'
 import auth from '@react-native-firebase/auth';
-import Home from './Screens/Home'
+import Login from './Screens/Login'
+import TabNav from './Navigation/TabNav'
 export default function App(){
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
@@ -22,13 +23,13 @@ export default function App(){
 
   if (!user) {
     return (
-      <NavigationContainer >
-      <StackNavigator />
-    </NavigationContainer>
+      <Login />
     );
   }
 
   return(
-    <Home />
+    <NavigationContainer >
+        <TabNav />
+    </NavigationContainer>
   )
 }

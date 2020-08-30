@@ -1,12 +1,19 @@
+{/*
+Since we can only fetch images from the Picsum API right now,doing both video and images isn't feasible,
+Also the right way is to determine the type of data we've fetched and then render it accordingly:
+eg- if(item.type=='Video'){return <Video Yada Yada />}
+    else return <Image Yada Yada />
+makes me wonder how much delay will this add to the render time of the app.
+*/}
 import React,{Component} from 'react';
 import {View,Text,FlatList,Image,Dimensions,StyleSheet, InteractionManager, Button,LayoutAnimation } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import IonIcons from 'react-native-vector-icons/Ionicons' 
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 const APIkey='pkYXCJNrEuxIR5gl15VI6_HfR1ecgKq2NwKLkiOzd2M';
 const windowHeight=Dimensions.get('window').height;
 const windowWidth=Dimensions.get('window').width;
-
 
 const ImageData=[{key:'1',imageURI:{uri:'https://images.unsplash.com/photo-1597871761588-97ebfda1eb5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'HealthFreak11'},
   {key:'2',imageURI:{uri:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'LovelyLeslie'},
@@ -31,8 +38,9 @@ export default class Home extends Component{
 
   loadWallpapers=async ()=>{
     try{
-    ImageList=await axios.get(`https://picsum.photos/v2/list?random=1&limit=40&random=4`)
+    ImageList=await axios.get(`https://picsum.photos/v2/list?limit=40&random=4`)
     this.setState({images:ImageList.data})
+    console.log(ImageList)
     } 
     catch(err){
       console.log(err)
@@ -47,7 +55,7 @@ export default class Home extends Component{
     LayoutAnimation.easeInEaseOut();
     return(
       <View style={{flex:1}}>
-        <Button title='Logout' onPress={()=>auth().signOut() } />
+        <Button title='Logout' onPress={()=>auth().signOut()} />
       <FlatList
         data={this.state.images}
         initialNumToRender={8}
@@ -78,6 +86,7 @@ export default class Home extends Component{
         }
       }
       />
+      {/* <IonIcons name='add-circle' size={55} color='indigo' style={{position:'absolute',right:15,bottom:15}} /> */}
       </View>
     );
   }
