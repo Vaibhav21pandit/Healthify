@@ -40,7 +40,7 @@ export default class Home extends Component{
     try{
     ImageList=await axios.get(`https://picsum.photos/v2/list?limit=40&random=4`)
     this.setState({images:ImageList.data})
-    console.log(ImageList)
+    // console.log(ImageList)
     } 
     catch(err){
       console.log(err)
