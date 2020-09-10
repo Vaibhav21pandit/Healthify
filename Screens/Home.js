@@ -1,30 +1,27 @@
-{/*
-Since we can only fetch images from the Picsum API right now,doing both video and images isn't feasible,
-Also the right way is to determine the type of data we've fetched and then render it accordingly:
-eg- if(item.type=='Video'){return <Video Yada Yada />}
-    else return <Image Yada Yada />
-makes me wonder how much delay will this add to the render time of the app.
-*/}
 import React,{Component} from 'react';
-import {View,Text,FlatList,Image,Dimensions,StyleSheet, InteractionManager, Button,LayoutAnimation } from 'react-native';
+import {View,Text,FlatList,Image,Dimensions,StyleSheet,Button,LayoutAnimation} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// import IonIcons from 'react-native-vector-icons/Ionicons' 
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
+import RNFetchBlob from 'rn-fetch-blob'
+import Share from 'react-native-share'
+
+const RNFS=RNFetchBlob.fs;
 const APIkey='pkYXCJNrEuxIR5gl15VI6_HfR1ecgKq2NwKLkiOzd2M';
 const windowHeight=Dimensions.get('window').height;
 const windowWidth=Dimensions.get('window').width;
 
-const ImageData=[{key:'1',imageURI:{uri:'https://images.unsplash.com/photo-1597871761588-97ebfda1eb5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'HealthFreak11'},
+const ImageData=[
+  {key:'1',imageURI:{uri:'https://images.unsplash.com/photo-1597871761588-97ebfda1eb5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'HealthFreak11'},
   {key:'2',imageURI:{uri:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'LovelyLeslie'},
   {key:'3',imageURI:{uri:'https://images.unsplash.com/photo-1521805492803-3b9c3792c278?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'GymLover36'}
 ];
 
-const AvatarData={
-  HealthFreak11:'https://images.unsplash.com/photo-1583951290243-970177c6277d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
-  LovelyLeslie:'https://images.unsplash.com/photo-1593440497401-b87d3bb3fb8b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
-  GymLover36:'https://images.unsplash.com/photo-1597750955232-b6040c843cf4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'
-};
+// const AvatarData={
+//   HealthFreak11:'https://images.unsplash.com/photo-1583951290243-970177c6277d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+//   LovelyLeslie:'https://images.unsplash.com/photo-1593440497401-b87d3bb3fb8b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+//   GymLover36:'https://images.unsplash.com/photo-1597750955232-b6040c843cf4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'
+// };
 
 export default class Home extends Component{
   constructor(props){
@@ -32,7 +29,9 @@ export default class Home extends Component{
     this.state={
       heartColor:'rgba(0,0,0,0.2)',
       poopColor:'rgba(0,0,0,0.2)',
-      images:[]
+      images:[],
+      imagePath:'',
+      sharePath:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'    
     }
   }
 
@@ -47,6 +46,23 @@ export default class Home extends Component{
     }
   }
 
+  shareImage(ImageURL,type){
+    let filePath=null;
+    RNFetchBlob.config({fileCache:true})
+    .fetch('GET',ImageURL)
+    .then(resp=>{
+      filePath=resp.path();
+      console.log(ImageURL);
+      return resp.readFile('base64')
+    })
+    .then(async base64data=>{
+      base64data=`data:${type};base64,`+base64data;
+      await Share.open({message:'Download Mazzaa app today!',url:base64data})
+      await RNFS.unlink(filePath)
+    })
+    
+  }
+
   componentDidMount(){
     this.loadWallpapers()
   }
@@ -55,7 +71,8 @@ export default class Home extends Component{
     LayoutAnimation.easeInEaseOut();
     return(
       <View style={{flex:1}}>
-        <Button title='Logout' onPress={()=>auth().signOut()} />
+        <Button title='logout' color='blue' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} onPress={()=>auth().signOut()} />
+        {/* <Icon name='logout' onPress={()=>auth().signOut()} style={{position:'absolute',right:305,bottom:55}} size={45} color='indigo' /> */}
       <FlatList
         data={this.state.images}
         initialNumToRender={8}
@@ -64,7 +81,7 @@ export default class Home extends Component{
           return(
           <View style={styles.homeScreen}>
             <View style={styles.postHeader}>
-              <Image style={styles.avatar} source={{uri:item.url}} />
+              <Image style={styles.avatar} source={{uri:item.download_url}} />
               <Text style={styles.usernameText}>{item.author}</Text>
               <Icon name='dots-vertical' style={styles.postHeaderIcon} color='white' size={35} onPress={()=>alert(`${item.author} posted this shit`)} />
             </View>
@@ -75,10 +92,11 @@ export default class Home extends Component{
               <View style={styles.postFooterIconTray}>
                 <Icon name='heart' size={35} onPress={()=>this.setState({heartColor:'red'})} color={this.state.heartColor} style={styles.postFooterIcon} />
                 <Icon name='emoticon-poop' size={35} onPress={()=>this.setState({poopColor:'#a52a2a'})} color={this.state.poopColor} style={styles.postFooterIcon}  />
+                <Icon name='whatsapp' size={35} color='green' style={styles.postfooterShare} onPress={()=>{this.shareImage(item.download_url,'image/jpeg')}}/>
               </View>
               <View style={styles.footerContent}>
                 <Text style={styles.footerCaption}>{`${item.author}`}</Text>
-                <Text numberOfLines={5}  style={styles.postFooterComment}>Getting Buff at the Gym,I remember the first time I set foot in here anf felt like home.Thanks to this Journey It's been so inspiring</Text>
+                <Text numberOfLines={3}  style={styles.postFooterComment}>Getting Buff at the Gym,I remember the first time I set foot in here and felt like home.Thanks to this Journey It's been so inspiring</Text>
               </View>
             </View>
           </View>
@@ -86,7 +104,7 @@ export default class Home extends Component{
         }
       }
       />
-      {/* <IonIcons name='add-circle' size={55} color='indigo' style={{position:'absolute',right:15,bottom:15}} /> */}
+      {/* <Button title='logout' color='indigo' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} /> */}
       </View>
     );
   }
@@ -104,10 +122,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     backgroundColor:'indigo',
     alignItems:'center',
-    borderTopColor:'grey',
-    borderTopWidth:2,
-    borderBottomColor:'grey',
-    borderBottomWidth:2
+    elevation:8
   },  
   usernameText:{
     color:'white',
@@ -137,26 +152,43 @@ const styles = StyleSheet.create({
     justifyContent:'flex-start'
   },
   postFooterIconTray:{
-    flexDirection:'row'
+    flexDirection:'row',
+    elevation:5
+
   },
 
   postFooterIcon:{
     paddingHorizontal:5,
     paddingVertical:10
   },
+  postfooterShare:{
+    position:"absolute",
+    right:windowWidth/35,
+    top:windowHeight/70
+  },
 
   footerContent:{
-    flexDirection:'row'
+    flexDirection:'row',
+    alignItems:'baseline'
   },
 
   footerCaption:{
     fontWeight:'bold',
-    paddingHorizontal:10,
+    paddingHorizontal:6,
     paddingVertical:5,
     fontSize:15
   },
   postFooterComment:{
     fontSize:12,
-    paddingVertical:10
+    paddingVertical:6,
+    paddingRight:3
   }
 })
+
+{/*
+Since we can only fetch images from the Picsum API right now,doing both video and images isn't feasible,
+Also the right way is to determine the type of data we've fetched and then render it accordingly:
+eg- if(item.type=='Video'){return <Video Yada Yada />}
+    else return <Image Yada Yada />
+makes me wonder how much delay will this add to the render time of the app.
+*/}

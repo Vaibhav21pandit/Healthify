@@ -30,17 +30,14 @@ export default function Login({navigation}) {
 
     console.error(error);
   });
-
   }
-  
-  
-  
+
   return (
     <KeyboardAvoidingView style={{flex:1}}>
     <ImageBackground source={{uri:ImageURL}} style={styles.container}>
       <Text style={styles.IconText}> Healthify </Text>
-      <TextInput placeholder='E-mail' placeholderTextColor='white' style={styles.InputBar} onChangeText={(text)=>{setEmail(text)}} value={Email} />
-      <TextInput placeholder='Password' placeholderTextColor='white' style={styles.InputBar} onChangeText={(text)=>{setPassword(text)}} value={Password}  />
+      <TextInput keyboardType='email-address' placeholder='E-mail' placeholderTextColor='white' style={styles.InputBar} onChangeText={(text)=>{setEmail(text)}} value={Email} />
+      <TextInput secureTextEntry={true} placeholder='Password' placeholderTextColor='white' style={styles.InputBar} onChangeText={(text)=>{setPassword(text)}} value={Password}  />
       <Button title='Login' color='midnightblue' style={styles.submitButton} onPress={()=> SignupUser(Email,Password)} />
       <Text style={styles.normalText}>Social Login</Text>
       <View style={{flexDirection:'row',marginTop:50}}>

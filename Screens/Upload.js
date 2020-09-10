@@ -1,27 +1,43 @@
 import React,{Component} from 'react';
-import {View ,Text, Image, Button,StyleSheet } from 'react-native';
+import {View ,Text, Image, Button,StyleSheet, Keyboard,TextInput, KeyboardAvoidingView } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import Entypo from 'react-native-vector-icons/Entypo'
-// import { v4 as uuidv4 } from 'uuid';
-import { utils } from '@react-native-firebase/app';
+import { v4 as uuidv4 } from 'uuid';
 
-// const fs=require('fs');
 
-export function Graphics(state){
-  const options = {
-    title: 'Select Avatar',
-    customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
-    storageOptions: {
-      skipBackup: true,
-      path: 'images',
-    },
-  };
+export default class Upload extends Component{
+  constructor(props){
+    super(props);
+    this.state={
+        avatarSource:null,
+        imageSource:''
+    }
+    this.options = {
+      title: 'Select Avatar',
+      customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        quality:0.6
+      },
+    };
+  }
+
+  uploadImageFirebase=async() => {
+    // const imageUploadId = Math.random().toString();
+    const reference=storage().ref('HiThereBoiz.jpg');
+    try{
+    await reference.putFile(this.state.imagePath)
+    }
+    catch(err){
+      console.log(err)}
+    alert('Uploaded');
+  }
 
   ChooseImage=async (options)=>{
     ImagePicker.showImagePicker(options, (response) => {
-    console.log('Response = ', response.uri);
-   
+
     if (response.didCancel) {
       console.log('User cancelled image picker');
     } else if (response.error) {
@@ -37,63 +53,28 @@ export function Graphics(state){
    
       this.setState({
         avatarSource: source,
-        imagePath: response.path
-      });
-    }
-  }); 
-}
-
-  if(state='k'){
-    return <Entypo name='upload' color='indigo' size={45} onPress={()=>ChooseImage(options)} />
-  }
-  return <Image source={{uri:state}} style={styles.Image} />
-}
-
-export default class Upload extends Component{
-  constructor(props){
-      super(props);
-      this.state={
-          avatarSource:'k',
-          imageSource:'',
-          imagePath:'',
+        imagePath: response.path,
+        });
       }
-      // this.options = {
-      //   title: 'Select Avatar',
-      //   customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
-      //   storageOptions: {
-      //     skipBackup: true,
-      //     path: 'images',
-      //   },
-      // };
+    }); 
   }
 
-  downloadImageFirebase=async()=>{
-    const reference = await storage().ref('Venkatesh.jpeg').getDownloadURL();
-    console.log(reference)
-    this.setState({imageSource:reference});
-  }
-
-  uploadImageFirebase=async() => {
-    // const imageUploadId = Math.random().toString();
-    const reference=storage().ref('HiThere.jpg');
-    (await reference.putFile(this.state.imagePath)).error 
-    .catch(Error =>{console.log(Error)})
-    console.log('Uploaded');
-  }
-
-
-    // componentDidMount(){
-    //     this.ChooseImage(this.options);
-    //     this.downloadImageFirebase();
-    // }
-    render(){
-        return(
-            <View style={styles.Container}>
-               <Graphics state={this.state.avatarSource}  />
-                <Button title='Upload' onPress={()=> {this.uploadImageFirebase()}}/>
-            </View>
-        );
+  render(){
+    if(this.state.avatarSource==null){
+      return (
+        <View style={styles.Container}>
+          <Entypo name='upload' color='indigo' size={45} onPress={() => this.ChooseImage(this.options)} />
+        </View>
+      )
     }
+    else return(
+        <KeyboardAvoidingView style={styles.Container}>
+            <Image source={{uri:this.state.avatarSource}} style={styles.Image} />
+            <TextInput placeholder='Input Caption' numberOfLines={2} maxLength={255} keyboardType='twitter'  />
+            <Button title='Upload' onPress={()=> {this.uploadImageFirebase()}}/>
+      </KeyboardAvoidingView>
+  );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -106,5 +87,4 @@ const styles = StyleSheet.create({
     height:400,
     width:400
   }
-
 })
