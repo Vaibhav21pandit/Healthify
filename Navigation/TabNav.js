@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Home from '../Screens/Home'
 import Upload from '../Screens/Upload'
-import Inbox from '../Screens/Inbox'
+import Profile from '../Screens/Profile'
 
 const Tab=createBottomTabNavigator();
 
@@ -37,7 +37,7 @@ export default function BottomTabs(){
       >
             <Tab.Screen name='Home' component={Home} />
             <Tab.Screen name='Upload' component={Upload} />
-            <Tab.Screen name='Inbox' component={Inbox} />
+            <Tab.Screen name='Profile' component={Profile} />
         </Tab.Navigator>
     );
 }

@@ -5,7 +5,8 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import RNFetchBlob from 'rn-fetch-blob'
 import Share from 'react-native-share'
-
+import SplashScreen from './SplashScreen'
+ 
 const RNFS=RNFetchBlob.fs;
 const APIkey='pkYXCJNrEuxIR5gl15VI6_HfR1ecgKq2NwKLkiOzd2M';
 const windowHeight=Dimensions.get('window').height;
@@ -31,19 +32,20 @@ export default class Home extends Component{
       poopColor:'rgba(0,0,0,0.2)',
       images:[],
       imagePath:'',
-      sharePath:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'    
+      isLoading:true    
     }
   }
 
   loadWallpapers=async ()=>{
     try{
-    ImageList=await axios.get(`https://picsum.photos/v2/list?limit=40&random=4`)
+    ImageList=await axios.get(`https://picsum.photos/v2/list?limit=3`)
     this.setState({images:ImageList.data})
     // console.log(ImageList)
     } 
     catch(err){
       console.log(err)
     }
+    this.setState({isLoading:false})
   }
 
   shareImage(ImageURL,type){
@@ -64,51 +66,58 @@ export default class Home extends Component{
   }
 
   componentDidMount(){
-    this.loadWallpapers()
+    setTimeout((async()=>this.loadWallpapers()),3000)    
   }
+
+  _renderItem=({item})=>{
+    return(
+      <View style={styles.homeScreen}>
+        <View style={styles.postHeader}>
+          <Image style={styles.avatar} source={{uri:item.download_url}} />
+          <Text style={styles.usernameText}>{item.author}</Text>
+          <Icon name='dots-vertical' style={styles.postHeaderIcon} color='white' size={35} onPress={()=>alert(`${item.author} posted this shit`)} />
+        </View>
+
+        <Image style={styles.postImage} source={{uri:item.download_url}} />
+
+        <View style={styles.postFooter}>
+          <View style={styles.postFooterIconTray}>
+            <Icon name='heart' size={35} onPress={()=>this.setState({heartColor:'red'})} color={this.state.heartColor} style={styles.postFooterIcon} />
+            <Icon name='emoticon-poop' size={35} onPress={()=>this.setState({poopColor:'#a52a2a'})} color={this.state.poopColor} style={styles.postFooterIcon}  />
+            <Icon name='whatsapp' size={35} color='green' style={styles.postfooterShare} onPress={()=>{this.shareImage(item.download_url,'image/jpeg')}}/>
+          </View>
+          <View style={styles.footerContent}>
+            <Text style={styles.footerCaption}>{`${item.author}`}</Text>
+            <Text numberOfLines={3}  style={styles.postFooterComment}>Getting Buff at the Gym,I remember the first time I set foot in here and felt like home.Thanks to this Journey It's been so inspiring</Text>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
   render()
   {
     LayoutAnimation.easeInEaseOut();
+    
     return(
-      <View style={{flex:1}}>
+      this.state.isLoading ?
+      (<SplashScreen/>):(
+     
+     <View style={{flex:1}}>
         <Button title='logout' color='blue' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} onPress={()=>auth().signOut()} />
         {/* <Icon name='logout' onPress={()=>auth().signOut()} style={{position:'absolute',right:305,bottom:55}} size={45} color='indigo' /> */}
-      <FlatList
-        data={this.state.images}
-        initialNumToRender={8}
-        // onEndReachedThreshold={}
-        renderItem={({item}) =>{
-          return(
-          <View style={styles.homeScreen}>
-            <View style={styles.postHeader}>
-              <Image style={styles.avatar} source={{uri:item.download_url}} />
-              <Text style={styles.usernameText}>{item.author}</Text>
-              <Icon name='dots-vertical' style={styles.postHeaderIcon} color='white' size={35} onPress={()=>alert(`${item.author} posted this shit`)} />
-            </View>
-
-            <Image style={styles.postImage} source={{uri:item.download_url}} />
-
-            <View style={styles.postFooter}>
-              <View style={styles.postFooterIconTray}>
-                <Icon name='heart' size={35} onPress={()=>this.setState({heartColor:'red'})} color={this.state.heartColor} style={styles.postFooterIcon} />
-                <Icon name='emoticon-poop' size={35} onPress={()=>this.setState({poopColor:'#a52a2a'})} color={this.state.poopColor} style={styles.postFooterIcon}  />
-                <Icon name='whatsapp' size={35} color='green' style={styles.postfooterShare} onPress={()=>{this.shareImage(item.download_url,'image/jpeg')}}/>
-              </View>
-              <View style={styles.footerContent}>
-                <Text style={styles.footerCaption}>{`${item.author}`}</Text>
-                <Text numberOfLines={3}  style={styles.postFooterComment}>Getting Buff at the Gym,I remember the first time I set foot in here and felt like home.Thanks to this Journey It's been so inspiring</Text>
-              </View>
-            </View>
-          </View>
-          )
-        }
-      }
-      />
-      {/* <Button title='logout' color='indigo' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} /> */}
+        <FlatList
+          data={this.state.images}
+          initialNumToRender={8}
+          // onEndReachedThreshold={}
+          renderItem={(item)=>this._renderItem(item)}
+          />
       </View>
-    );
-  }
+    )
+    )
 }
+}
+
 
 const styles = StyleSheet.create({
   homeScreen:{
