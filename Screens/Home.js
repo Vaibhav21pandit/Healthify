@@ -101,8 +101,8 @@ export default class Home extends Component{
     
     return(
       this.state.isLoading ?
-      (<SplashScreen/>):(
-     
+      <SplashScreen/> :
+      (     
      <View style={{flex:1}}>
         <Button title='logout' color='blue' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} onPress={()=>auth().signOut()} />
         {/* <Icon name='logout' onPress={()=>auth().signOut()} style={{position:'absolute',right:305,bottom:55}} size={45} color='indigo' /> */}

@@ -1,8 +1,14 @@
+//Profile.js 
 import React from 'react';
 import { View,Text,Button ,FlatList, Image} from 'react-native';
 import axios from 'axios'
 import SplashScreen from './SplashScreen'
+import {useNavigation} from '@react-navigation/native'
 
+export function BackButton(){
+  const navigation=useNavigation()
+  return <Button title='Dump' onPress={()=>navigation.navigate('Dump')} />
+}
 
 const BASE_URL = 'https://dummyapi.io/data/api';
 const APP_ID = `5f5fb88d7a86563816d9881e`;
@@ -16,12 +22,13 @@ export default class Profile extends React.Component{
       User:null,
     }
   }
+
   getUserData=()=>{
     this.setState({isLoading:true})
     axios.get(`${BASE_URL}/user`, { headers: { 'app-id': APP_ID } })
           .then(({ data }) => this.setState({Data:data.data}))
           .catch(console.error)
-          .finally(() => {this.setState({isLoading:false}),console.log(this.state.Data)}) 
+          .finally(() => {this.setState({isLoading:false})}) 
   }
 
   //this.setState({isLoading:false})
@@ -36,6 +43,7 @@ export default class Profile extends React.Component{
   else {
     return(
       <View>
+        <BackButton />
         <FlatList
         pagingEnabled={true}
         data={this.state.Data}

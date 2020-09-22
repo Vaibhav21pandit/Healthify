@@ -1,90 +1,112 @@
-import React,{Component} from 'react';
-import {View ,Text, Image, Button,StyleSheet, Keyboard,TextInput, KeyboardAvoidingView } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
-import storage from '@react-native-firebase/storage';
+import React, { Component } from 'react';
+import {View,Text,PermissionsAndroid, Image,ScrollView, StyleSheet,Dimensions, ActivityIndicator,TouchableWithoutFeedback} from 'react-native'
+import CameraRoll from "@react-native-community/cameraroll";
 import Entypo from 'react-native-vector-icons/Entypo'
-import { v4 as uuidv4 } from 'uuid';
+import Video from 'react-native-video';
 
+const windowHeight=Dimensions.get('window').height
+const windowWidth=Dimensions.get('window').width
 
-export default class Upload extends Component{
+export default class Dump extends Component{
   constructor(props){
     super(props);
     this.state={
-        avatarSource:null,
-        imageSource:''
+      ImageArray:null,
+      displayImage:null,
+      type:null
     }
-    this.options = {
-      title: 'Select Avatar',
-      customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-        quality:0.6
-      },
-    };
+  }
+    
+  hasAndroidPermission= async() => {
+    const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;  
+    const hasPermission = await PermissionsAndroid.check(permission);
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(permission);
+    return status === 'granted';
   }
 
-  uploadImageFirebase=async() => {
-    // const imageUploadId = Math.random().toString();
-    const reference=storage().ref('HiThereBoiz.jpg');
-    try{
-    await reference.putFile(this.state.imagePath)
+  GetPhotos=async()=>{
+    const photoOptions={
+      first:25
     }
-    catch(err){
-      console.log(err)}
-    alert('Uploaded');
+      CameraRoll.getPhotos(photoOptions)
+      .then(r=>{this.setState({ImageArray:r.edges}),console.log(r.edges)})
+      .catch(err => console.log(err))
+      .finally(console.log(this.state.ImageArray))    
   }
 
-  ChooseImage=async (options)=>{
-    ImagePicker.showImagePicker(options, (response) => {
-
-    if (response.didCancel) {
-      console.log('User cancelled image picker');
-    } else if (response.error) {
-      console.log('ImagePicker Error: ', response.error);
-    } else if (response.customButton) {
-      console.log('User tapped custom button: ', response.customButton);
-    } else {
-        // this.setState({imageSource:response.uri})
-      const source = 'data:image/jpeg;base64,' + response.data 
-      
-      // You can also display the image using data:
-      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-   
-      this.setState({
-        avatarSource: source,
-        imagePath: response.path,
-        });
-      }
-    }); 
+  componentDidMount(){
+    this.GetPhotos()
   }
 
   render(){
-    if(this.state.avatarSource==null){
-      return (
-        <View style={styles.Container}>
-          <Entypo name='upload' color='indigo' size={45} onPress={() => this.ChooseImage(this.options)} />
+  if (this.state.ImageArray!=null){ 
+    return(
+    <View style={styles.container}>
+      <View style={styles.uploader}>
+        {(this.state.displayImage==null) && <Entypo name='upload' color='indigo' size={45} />}
+        {(this.state.displayImage!=null && this.state.type=='image/jpeg') && <Image resizeMode='contain' style={{width:300,height:300}} source={{uri:this.state.displayImage}} />}
+        {(this.state.displayImage!=null && this.state.type=='video/mp4') && <Video  resizeMode='contain' volume={0.6} source={{uri:this.state.displayImage}} style={{width:300,height:300}} />}
+      </View>
+      <View style={styles.scroller} >
+        <ScrollView horizontal={true}>
+          {this.state.ImageArray.map((p, i) => {
+          return (
+            <View>
+              <TouchableWithoutFeedback onPress={()=>this.setState({displayImage:p.node.image.uri,type:p.node.type})}>
+                <Image
+                  key={i}
+                  style={styles.photos}
+                  source={{ uri: p.node.image.uri }}
+                  resizeMode='cover'
+                />
+              </TouchableWithoutFeedback>
+            </View>       
+          );
+          })}
+        </ScrollView>
+      </View>
+    </View>
+  )
+}
+    else{
+      return(
+        <View>
+          <ActivityIndicator />
         </View>
-      )
-    }
-    else return(
-        <KeyboardAvoidingView style={styles.Container}>
-            <Image source={{uri:this.state.avatarSource}} style={styles.Image} />
-            <TextInput placeholder='Input Caption' numberOfLines={2} maxLength={255} keyboardType='twitter'  />
-            <Button title='Upload' onPress={()=> {this.uploadImageFirebase()}}/>
-      </KeyboardAvoidingView>
-  );
-  }
+    )
+      }
+}
 }
 
 const styles = StyleSheet.create({
-  Container:{
+  container:{
     flex:1,
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
+    backgroundColor:'beige'
   },
-  Image:{
-    height:400,
-    width:400
+  uploader:{
+    flex:3,
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-around'
+  },
+  scroller:{
+    flex:1,
+    alignItems:'flex-end',
+    justifyContent:'flex-end'
+  },
+  photos:{
+    flex:1,
+    width:windowWidth/3 ,
+    height: windowHeight/9,
+    marginHorizontal:5,
+    borderColor:'grey',
+    borderRadius:5,
+    borderWidth:2
   }
 })

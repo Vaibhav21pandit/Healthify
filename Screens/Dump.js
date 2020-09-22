@@ -1,132 +1,92 @@
 import React,{Component} from 'react';
-import {View,Text,FlatList,Image,Dimensions,StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-const windowHeight=Dimensions.get('window').height;
-const windowWidth=Dimensions.get('window').width;
+import {View ,Text, Image, Button,StyleSheet, Keyboard,TextInput, KeyboardAvoidingView } from 'react-native';
+import ImagePicker from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import Entypo from 'react-native-vector-icons/Entypo'
+import { v4 as uuidv4 } from 'uuid';
 
 
-const ImageData=[{key:'1',imageURI:{uri:'https://images.unsplash.com/photo-1597871761588-97ebfda1eb5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'HealthFreak11'},
-  {key:'2',imageURI:{uri:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'LovelyLeslie'},
-  {key:'3',imageURI:{uri:'https://images.unsplash.com/photo-1521805492803-3b9c3792c278?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'GymLover36'}
-];
-
-const AvatarData={
-  HealthFreak11:'https://images.unsplash.com/photo-1583951290243-970177c6277d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
-  LovelyLeslie:'https://images.unsplash.com/photo-1593440497401-b87d3bb3fb8b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
-  GymLover36:'https://images.unsplash.com/photo-1597750955232-b6040c843cf4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'
-};
-
-export default class App extends Component{
+export default class Upload extends Component{
   constructor(props){
     super(props);
     this.state={
-      heartColor:'rgba(0,0,0,0.2)',
-      poopColor:'rgba(0,0,0,0.2)'
+        avatarSource:null,
+        imageSource:''
     }
+    this.options = {
+      title: 'Select Avatar',
+      customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+        quality:0.6
+      },
+    };
   }
-  
-  render(){
-    return(
-      <View>
-      <FlatList
-        data={ImageData}
-        renderItem={({item}) =>{
-          return(
-          <View style={styles.homeScreen}>
-            <View style={styles.postHeader}>
-              {/* <Avatar user={item.userName} /> */}
-              <Image style={styles.avatar} source={{uri:AvatarData[item.userName]}} />
-              <Text style={styles.usernameText}>{item.userName}</Text>
-              <Icon name='dots-vertical' style={styles.postHeaderIcon} color='white' size={35} onPress={()=>alert(`${item.userName} posted this shit`)} />
-            </View>
 
-            <Image style={styles.postImage} source={item.imageURI} />
+  uploadImageFirebase=async() => {
+    // const imageUploadId = Math.random().toString();
+    const reference=storage().ref('HiThereBoiz.jpg');
+    try{
+    await reference.putFile(this.state.imagePath)
+    }
+    catch(err){
+      console.log(err)}
+    alert('Uploaded');
+  }
 
-            <View style={styles.postFooter}>
-              <View style={styles.postFooterIconTray}>
-                <Icon name='heart' size={35} onPress={()=>this.setState({heartColor:'red'})} color={this.state.heartColor} style={styles.postFooterIcon} />
-                <Icon name='emoticon-poop' size={35} onPress={()=>this.setState({poopColor:'#a52a2a'})} color={this.state.poopColor} style={styles.postFooterIcon}  />
-              </View>
-              <View style={styles.footerContent}>
-                <Text style={styles.footerCaption}>{`${item.userName}`}</Text>
-                <Text numberOfLines={5}  style={styles.postFooterComment}>Getting Buff at the Gym,I remember the first time I set foot in here anf felt like home.Thanks to this Journey It's been so inspiring</Text>
-              </View>
-            </View>
-          </View>
-          )
-        }
+  ChooseImage=async (options)=>{
+    ImagePicker.showImagePicker(options, (response) => {
+
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.error) {
+      console.log('ImagePicker Error: ', response.error);
+    } else if (response.customButton) {
+      console.log('User tapped custom button: ', response.customButton);
+    } else {
+        // this.setState({imageSource:response.uri})
+      const source = 'data:image/jpeg;base64,' + response.data 
+      
+      // You can also display the image using data:
+      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+   
+      this.setState({
+        avatarSource: source,
+        imagePath: response.path,
+        });
       }
-      />
-      </View>
-    );
+    }); 
+  }
+
+  render(){
+    if(this.state.avatarSource==null){
+      return (
+        <View style={styles.Container}>
+          <Entypo name='upload' color='indigo' size={45} onPress={() => this.ChooseImage(this.options)} />
+        </View>
+      )
+    }
+    else return(
+        <KeyboardAvoidingView style={styles.Container}>
+            <Image source={{uri:this.state.avatarSource}} style={styles.Image} />
+            <TextInput placeholder='Input Caption' numberOfLines={2} maxLength={255} keyboardType='twitter'  />
+            <Button title='Upload' onPress={()=> {this.uploadImageFirebase()}}/>
+      </KeyboardAvoidingView>
+  );
   }
 }
 
 const styles = StyleSheet.create({
-  homeScreen:{
+  Container:{
     flex:1,
     alignItems:'center',
     justifyContent:'center'
   },
-  postHeader:{
-    height:55,
-    width:windowWidth,
-    flexDirection:'row',
-    backgroundColor:'indigo',
-    alignItems:'center',
-    borderTopColor:'grey',
-    borderTopWidth:2,
-    borderBottomColor:'grey',
-    borderBottomWidth:2
-  },  
-  usernameText:{
-    color:'white',
-    fontWeight:'bold',
-    fontSize:15,
-    paddingHorizontal:5
-
-  },
-  postImage:{
-    width:windowWidth,
-    height:300
-  },
-  avatar:{
-    height:30,
-    width:30,
-    borderRadius:50,
-    paddingHorizontal:25
-  },
-  postHeaderIcon:{
-    position:'absolute',
-    right:4
-  },
-  postFooter:{
-    height:300,
-    width:windowWidth,
-    backgroundColor:'white',
-    justifyContent:'flex-start'
-  },
-  postFooterIconTray:{
-    flexDirection:'row'
-  },
-
-  postFooterIcon:{
-    paddingHorizontal:5,
-    paddingVertical:10
-  },
-
-  footerContent:{
-    flexDirection:'row'
-  },
-
-  footerCaption:{
-    fontWeight:'bold',
-    paddingHorizontal:10,
-    paddingVertical:5,
-    fontSize:15
-  },
-  postFooterComment:{
-    fontSize:12,
-    paddingVertical:10
+  Image:{
+    height:400,
+    width:400
   }
 })
+
+
