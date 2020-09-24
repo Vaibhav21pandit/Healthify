@@ -4,8 +4,8 @@ The Social Network for Health Freaks  :muscle: \
  :warning: Work in Progress \
 Made with  :heart: using React-Native,firebase and Redux. 
 
-Installation: /
-Clone the repo -> cd Healthify -> run npm install (assuming you have npm beforehand) ->react-native run-android OR react-native run-ios 
+Installation: \
+Clone the repo -> cd Healthify -> run npm install (assuming you have npm beforehand) ->react-native run-android OR react-native run-ios \
 
 TODO: \
  :white_check_mark: FireBase Email/Password Authorization \
