@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {View,Text,PermissionsAndroid, Image,ScrollView, StyleSheet,Dimensions, ActivityIndicator,TouchableWithoutFeedback} from 'react-native'
+import {View,Text,PermissionsAndroid, Image,ScrollView, StyleSheet,Dimensions, ActivityIndicator,TouchableWithoutFeedback, Button} from 'react-native'
 import CameraRoll from "@react-native-community/cameraroll";
 import Entypo from 'react-native-vector-icons/Entypo'
 import Video from 'react-native-video';
@@ -13,7 +13,8 @@ export default class Dump extends Component{
     this.state={
       ImageArray:null,
       displayImage:null,
-      type:null
+      type:null,
+      permission:false
     }
   }
     
@@ -21,11 +22,14 @@ export default class Dump extends Component{
     const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;  
     const hasPermission = await PermissionsAndroid.check(permission);
     if (hasPermission) {
+      this.setState({permission:true})
       return true;
     }
-
+    else{
     const status = await PermissionsAndroid.request(permission);
+    this.setState({permission:true})
     return status === 'granted';
+    }
   }
 
   GetPhotos=async()=>{
@@ -35,10 +39,11 @@ export default class Dump extends Component{
       CameraRoll.getPhotos(photoOptions)
       .then(r=>{this.setState({ImageArray:r.edges}),console.log(r.edges)})
       .catch(err => console.log(err))
-      .finally(console.log(this.state.ImageArray))    
+      .finally()    
   }
 
-  componentDidMount(){
+  async componentDidMount(){
+    await this.hasAndroidPermission()
     this.GetPhotos()
   }
 
@@ -46,12 +51,13 @@ export default class Dump extends Component{
   if (this.state.ImageArray!=null){ 
     return(
     <View style={styles.container}>
+      <Button title='Next' onPress={()=>console.log('Next')} style={styles.uploadButton} />
       <View style={styles.uploader}>
         {(this.state.displayImage==null) && <Entypo name='upload' color='indigo' size={45} />}
-        {(this.state.displayImage!=null && this.state.type=='image/jpeg') && <Image resizeMode='contain' style={{width:300,height:300}} source={{uri:this.state.displayImage}} />}
+        {(this.state.displayImage!=null && (this.state.type=='image/jpeg'||this.state.type=='image/png')) && <Image resizeMode='contain' style={{width:300,height:300}} source={{uri:this.state.displayImage}} />}
         {(this.state.displayImage!=null && this.state.type=='video/mp4') && <Video  resizeMode='contain' volume={0.6} source={{uri:this.state.displayImage}} style={{width:300,height:300}} />}
       </View>
-      <View style={styles.scroller} >
+      {(this.state.permission) && <View style={styles.scroller} >
         <ScrollView horizontal={true}>
           {this.state.ImageArray.map((p, i) => {
           return (
@@ -68,7 +74,7 @@ export default class Dump extends Component{
           );
           })}
         </ScrollView>
-      </View>
+      </View>}
     </View>
   )
 }
@@ -88,6 +94,12 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     backgroundColor:'beige'
+  },
+  uploadButton:{
+    position:'absolute',
+    right:10,
+    top:25
+
   },
   uploader:{
     flex:3,

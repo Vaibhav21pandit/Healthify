@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet ,Button,ImageBackground,Dimensions,TextInput,Pressable, KeyboardAvoidingView} from 'react-native';
+import { Text, View, StyleSheet ,Button,ImageBackground,Dimensions,TextInput,Keyboard, KeyboardAvoidingView} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign'
 import auth from '@react-native-firebase/auth';
 
@@ -36,19 +36,39 @@ export default function Login({navigation}) {
     <KeyboardAvoidingView style={{flex:1}}>
     <ImageBackground source={{uri:ImageURL}} style={styles.container}>
       <Text style={styles.IconText}> Healthify </Text>
-      <TextInput keyboardType='email-address' placeholder='E-mail' placeholderTextColor='white' style={styles.InputBar} onChangeText={(text)=>{setEmail(text)}} value={Email} />
-      <TextInput secureTextEntry={true} placeholder='Password' placeholderTextColor='white' style={styles.InputBar} onChangeText={(text)=>{setPassword(text)}} value={Password}  />
-      <Button title='Login' color='midnightblue' style={styles.submitButton} onPress={()=> SignupUser(Email,Password)} />
+       
+      <TextInput keyboardType='email-address' 
+        placeholder='E-mail' 
+        placeholderTextColor='white' 
+        style={styles.InputBar} 
+        onChangeText={(text)=>{setEmail(text)}} 
+        value={Email} 
+      />
+      <TextInput secureTextEntry={true} 
+        placeholder='Password' 
+        placeholderTextColor='white' 
+        style={styles.InputBar} 
+        onChangeText={(text)=>{setPassword(text)}} 
+        value={Password}  
+      />
+      <Button title='Login' 
+        color='midnightblue' 
+        style={styles.submitButton} 
+        onPress={()=> {SignupUser(Email,Password),Keyboard.dismiss()}} 
+        />
       <Text style={styles.normalText}>Social Login</Text>
+
       <View style={{flexDirection:'row',marginTop:50}}>
         <Text style={{color:'white'}}> Dont have an account yet?</Text>
         <Text style={{color:'dodgerblue',paddingHorizontal:3}} onPress={()=>console.log('Signup')}>Signup</Text>
       </View>
+
       <View style={styles.iconTray}>
         <Icon name="google" style={styles.trayIcons} size={24} color="cyan" />
         <Icon name="facebook-square" size={24} color="midnightblue" />
         <Icon name="twitter" size={24} color="dodgerblue" /> 
       </View>
+
     </ImageBackground>
     </KeyboardAvoidingView>
   );
