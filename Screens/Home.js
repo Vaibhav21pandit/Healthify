@@ -6,7 +6,8 @@ import auth from '@react-native-firebase/auth';
 import RNFetchBlob from 'rn-fetch-blob'
 import Share from 'react-native-share'
 import SplashScreen from './SplashScreen'
- 
+import {useNavigation} from '@react-navigation/native'
+
 const RNFS=RNFetchBlob.fs;
 const APIkey='pkYXCJNrEuxIR5gl15VI6_HfR1ecgKq2NwKLkiOzd2M';
 const windowHeight=Dimensions.get('window').height;
@@ -17,6 +18,17 @@ const ImageData=[
   {key:'2',imageURI:{uri:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'LovelyLeslie'},
   {key:'3',imageURI:{uri:'https://images.unsplash.com/photo-1521805492803-3b9c3792c278?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'GymLover36'}
 ];
+
+export function Header(){
+  const navigation=useNavigation();
+  return(
+    <View style={{backgroundColor:'cream',height:45,width:windowWidth,alignItems:'center',justifyContent:'space-between',flexDirection:'row',elevation:5}}>
+      <Image source={require('../src/assets/dumbbells.jpeg')} style={{height:35,width:60,paddingLeft:3}}/>
+      <Text style={{fontWeight:'bold',fontSize:25}}>Mazzaa</Text>
+      <Icon name='emoticon-cool' size={30} color='violet' style={{paddingRight:5}} onPress={()=>navigation.navigate('Profile')} />
+    </View>
+  )
+}
 
 // const AvatarData={
 //   HealthFreak11:'https://images.unsplash.com/photo-1583951290243-970177c6277d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
@@ -31,7 +43,7 @@ export default class Home extends Component{
       heartColor:'rgba(0,0,0,0.2)',
       poopColor:'rgba(0,0,0,0.2)',
       images:[],
-      imagePath:'',
+      // imagePath:'',
       isLoading:true    
     }
   }
@@ -66,7 +78,7 @@ export default class Home extends Component{
   }
 
   componentDidMount(){
-    setTimeout((async()=>this.loadWallpapers()),3000)    
+    setTimeout((async()=>this.loadWallpapers()),1000)    
   }
 
   _renderItem=({item})=>{
@@ -75,7 +87,7 @@ export default class Home extends Component{
         <View style={styles.postHeader}>
           <Image style={styles.avatar} source={{uri:item.download_url}} />
           <Text style={styles.usernameText}>{item.author}</Text>
-          <Icon name='dots-vertical' style={styles.postHeaderIcon} color='white' size={35} onPress={()=>alert(`${item.author} posted this shit`)} />
+          <Icon name='dots-vertical' style={styles.postHeaderIcon} color='black' size={35} onPress={()=>alert(`${item.author} posted this shit`)} />
         </View>
 
         <Image style={styles.postImage} source={{uri:item.download_url}} />
@@ -104,7 +116,8 @@ export default class Home extends Component{
       <SplashScreen/> :
       (     
      <View style={{flex:1}}>
-        <Button title='logout' color='blue' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} onPress={()=>auth().signOut()} />
+       <Header />
+        {/* <Button title='logout' color='blue' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} onPress={()=>auth().signOut()} /> */}
         {/* <Icon name='logout' onPress={()=>auth().signOut()} style={{position:'absolute',right:305,bottom:55}} size={45} color='indigo' /> */}
         <FlatList
           data={this.state.images}
@@ -129,12 +142,12 @@ const styles = StyleSheet.create({
     height:55,
     width:windowWidth,
     flexDirection:'row',
-    backgroundColor:'indigo',
+    backgroundColor:'white',
     alignItems:'center',
     elevation:8
   },  
   usernameText:{
-    color:'white',
+    color:'black',
     fontWeight:'bold',
     fontSize:15,
     paddingHorizontal:5

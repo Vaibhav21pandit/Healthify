@@ -63,6 +63,7 @@ export default class Upload extends Component{
     if(this.state.avatarSource==null){
       return (
         <View style={styles.Container}>
+          <Button title='PKMKB'></Button>
           <Entypo name='upload' color='indigo' size={45} onPress={() => this.ChooseImage(this.options)} />
         </View>
       )
@@ -85,7 +86,8 @@ const styles = StyleSheet.create({
   },
   Image:{
     height:400,
-    width:400
+    width:400,
+    resizeMode:'center'
   }
 })
 
