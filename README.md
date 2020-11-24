@@ -12,9 +12,10 @@ TODO: \
  :white_check_mark: Add Upload Functionality\
  :white_check_mark: Add Splash Screen \
  :white_check_mark: Add Profile tab \
+ :white_check_mark: Add Explore Section \ 
 :white_large_square: Randomizing Feed \
 :white_large_square: Adding LastKey for user Specific Feed \
-:white_large_square: Add Explore Section 
+
 
  
 
