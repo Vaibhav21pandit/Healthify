@@ -60,3 +60,4 @@ buck-out/
 
 #Local-Files
 Dump.js
+*.env

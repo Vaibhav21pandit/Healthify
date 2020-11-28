@@ -4,7 +4,7 @@ import Login from '../Screens/Login';
 import Dump from '../Screens/Dump'
 import Profile from '../Screens/Profile'
 import Home from '../Screens/Home'
-
+import Settings from "../Screens/Settings"
 const Stack = createStackNavigator();
 
 export default function StackNavigator(){
@@ -14,6 +14,8 @@ export default function StackNavigator(){
             <Stack.Screen name='Login' component={Login} options={{headerShown:false}}/>
             <Stack.Screen name='Dump' component={Dump} options={{headerShown:false}}/>
             <Stack.Screen name='Profile' component={Profile} options={{headerShown:false}}/>
+            <Stack.Screen name='Settings' component={Settings} options={{headerShown:false}}/>
+
         </Stack.Navigator>
     )
 }

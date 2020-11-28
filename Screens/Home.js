@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
-import {View,Text,FlatList,Image,Dimensions,StyleSheet,Button,LayoutAnimation} from 'react-native';
+import {View,Text,FlatList,Image,Dimensions,StyleSheet,Button,LayoutAnimation,TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IonIcon from 'react-native-vector-icons/Ionicons'
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 import RNFetchBlob from 'rn-fetch-blob'
@@ -8,24 +9,35 @@ import Share from 'react-native-share'
 import SplashScreen from './SplashScreen'
 import {useNavigation} from '@react-navigation/native'
 
+
 const RNFS=RNFetchBlob.fs;
+const profilePicture = 'https://images.unsplash.com/photo-1532384661798-58b53a4fbe37?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80' 
 const APIkey='pkYXCJNrEuxIR5gl15VI6_HfR1ecgKq2NwKLkiOzd2M';
 const windowHeight=Dimensions.get('window').height;
 const windowWidth=Dimensions.get('window').width;
 
 const ImageData=[
-  {key:'1',imageURI:{uri:'https://images.unsplash.com/photo-1597871761588-97ebfda1eb5f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'HealthFreak11'},
-  {key:'2',imageURI:{uri:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'LovelyLeslie'},
-  {key:'3',imageURI:{uri:'https://images.unsplash.com/photo-1521805492803-3b9c3792c278?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60'},userName:'GymLover36'}
+  {key:'1',download_url:'https://images.unsplash.com/photo-1571726656333-2640ca759d22?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxzZWFyY2h8OXx8Z3ltbmFzdHxlbnwwfHwwfA%3D%3D&auto=format&fit=crop&w=500&q=60',author:'HealthFreak11',caption:"Getting Buff at the Gym,I remember coming in here for the first Time."},
+  {key:'2',download_url:'https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',author:'LovelyLeslie',caption:"Berty Has been A good Mentor to me,I owe him a lot for all my gains."},
+  {key:'3',download_url:'https://images.unsplash.com/photo-1521805492803-3b9c3792c278?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',author:'GymLover36',caption:"Gym just felt like my home,This journey has been nothing but inspiring."}
 ];
+
+// const captions=[
+//   "Getting Buff at the Gym,I remember coming in here for the first Time.",
+//   "Berty Has been A good Mentor to me,I owe him a lot for all my gains.",
+//   "Gym just felt like my home,This journey has been nothing but inspiring."
+// ]
 
 export function Header(){
   const navigation=useNavigation();
   return(
     <View style={{backgroundColor:'cream',height:45,width:windowWidth,alignItems:'center',justifyContent:'space-between',flexDirection:'row',elevation:5}}>
-      <Image source={require('../src/assets/dumbbells.jpeg')} style={{height:35,width:60,paddingLeft:3}}/>
-      <Text style={{fontWeight:'bold',fontSize:25}}>Mazzaa</Text>
-      <Icon name='emoticon-cool' size={30} color='violet' style={{paddingRight:5}} onPress={()=>navigation.navigate('Profile')} />
+      {/* <Image source={require('../src/assets/dumbbells.jpeg')} style={{height:35,width:60,paddingLeft:3}}/> */}
+      <Text style={{fontWeight:'bold',fontFamily:'lucida-grande',fontSize:25,marginLeft:10}}>Mazzaa</Text>
+      {/* <IonIcon name='person' size={30} color='black' style={{paddingRight:5}} onPress={()=>navigation.navigate('Profile')} /> */}
+      <TouchableOpacity onPress={()=>navigation.navigate('Profile')}>
+        <Image source={{uri:profilePicture}} style={{height:30,width:30,borderRadius:20, marginRight:10}}  />
+      </TouchableOpacity>
     </View>
   )
 }
@@ -44,7 +56,7 @@ export default class Home extends Component{
       poopColor:'rgba(0,0,0,0.2)',
       images:[],
       // imagePath:'',
-      isLoading:true    
+      isLoading:false 
     }
   }
 
@@ -77,10 +89,13 @@ export default class Home extends Component{
     
   }
 
-  componentDidMount(){
-    setTimeout((async()=>this.loadWallpapers()),1000)    
-  }
+  // componentDidMount(){
+  //   setTimeout((async()=>this.loadWallpapers()),1000)    
+  // }
 
+  // componentDidMount(){
+  //   setTimeout(()=>this.setState({isLoading:false}),1000)
+  // }
   _renderItem=({item})=>{
     return(
       <View style={styles.homeScreen}>
@@ -95,12 +110,12 @@ export default class Home extends Component{
         <View style={styles.postFooter}>
           <View style={styles.postFooterIconTray}>
             <Icon name='heart' size={35} onPress={()=>this.setState({heartColor:'red'})} color={this.state.heartColor} style={styles.postFooterIcon} />
-            <Icon name='emoticon-poop' size={35} onPress={()=>this.setState({poopColor:'#a52a2a'})} color={this.state.poopColor} style={styles.postFooterIcon}  />
+            {/* <Icon name='emoticon-poop' size={35} onPress={()=>this.setState({poopColor:'#a52a2a'})} color={this.state.poopColor} style={styles.postFooterIcon}  /> */}
             <Icon name='whatsapp' size={35} color='green' style={styles.postfooterShare} onPress={()=>{this.shareImage(item.download_url,'image/jpeg')}}/>
           </View>
           <View style={styles.footerContent}>
-            <Text style={styles.footerCaption}>{`${item.author}`}</Text>
-            <Text numberOfLines={3}  style={styles.postFooterComment}>Getting Buff at the Gym,I remember the first time I set foot in here and felt like home.Thanks to this Journey It's been so inspiring</Text>
+            <Text numberOfLines={5}  style={styles.postFooterComment}>
+            <Text style={styles.footerCaption}>{`${item.author}`}</Text>{`${item.caption}`}</Text>
           </View>
         </View>
       </View>
@@ -120,7 +135,7 @@ export default class Home extends Component{
         {/* <Button title='logout' color='blue' style={{height:25,width:25,position:'absolute',right:15,bottom:15}} onPress={()=>auth().signOut()} /> */}
         {/* <Icon name='logout' onPress={()=>auth().signOut()} style={{position:'absolute',right:305,bottom:55}} size={45} color='indigo' /> */}
         <FlatList
-          data={this.state.images}
+          data={ImageData}
           initialNumToRender={8}
           // onEndReachedThreshold={}
           renderItem={(item)=>this._renderItem(item)}
@@ -160,7 +175,7 @@ const styles = StyleSheet.create({
   avatar:{
     height:30,
     width:30,
-    borderRadius:50,
+    borderRadius:10000,
     paddingHorizontal:25
   },
   postHeaderIcon:{
@@ -168,7 +183,7 @@ const styles = StyleSheet.create({
     right:4
   },
   postFooter:{
-    height:300,
+    height:200,
     width:windowWidth,
     backgroundColor:'white',
     justifyContent:'flex-start'
@@ -191,19 +206,21 @@ const styles = StyleSheet.create({
 
   footerContent:{
     flexDirection:'row',
-    alignItems:'baseline'
+    alignItems:'center',
+    marginHorizontal:3
   },
 
   footerCaption:{
     fontWeight:'bold',
     paddingHorizontal:6,
     paddingVertical:5,
-    fontSize:15
+    fontSize:15,
+    marginHorizontal:5
   },
   postFooterComment:{
-    fontSize:12,
+    fontSize:16,
     paddingVertical:6,
-    paddingRight:3
+    paddingRight:3,
   }
 })
 

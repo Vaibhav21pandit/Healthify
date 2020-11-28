@@ -1,39 +1,32 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text,StyleSheet,Dimensions, Image , TouchableOpacity,Button} from 'react-native'
+import { View, Text,StyleSheet,Dimensions, Image , TouchableOpacity,Button, ActivityIndicator} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import IonIcon from 'react-native-vector-icons/Ionicons'
 import { FlatList, RectButton } from 'react-native-gesture-handler';
 import axios from 'axios'
+import {useNavigation} from "@react-navigation/native"
 
 const BASE_URL = 'https://dummyapi.io/data/api';
 const APP_ID = `5f5fb88d7a86563816d9881e`;
+const profilePicture = 'https://images.unsplash.com/photo-1532384661798-58b53a4fbe37?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80' 
 
 const windowHeight=Dimensions.get('window').height;
 const windowWidth=Dimensions.get('window').width;
 
 function Header(props){
+  const navigation=useNavigation();
   return(
     <View style={styles.header}>
-      <Icon name='keyboard-backspace' size={25} color='black' onPress={()=>props.leftPress()} />
+      <Icon name='keyboard-backspace' size={25} color='black' onPress={()=> navigation.navigate('Home')} />
       <Text style={{fontWeight:'bold'}}>Muscle_Mason_Gym</Text>
-      <IonIcon name='settings-sharp' size={25} style={{marginRight:5}} color='black' onPress={()=>props.rightPress()} />
+      <IonIcon name='settings-sharp' size={25} style={{marginRight:5}} color='black' onPress={()=>navigation.navigate('Settings')} />
     </View>
   )
 }
 
-function Posts(item){
-  return(
-    <Image source={{uri:item.picture}} style={styles.carousel} />
-  )
-}
-
-export default function Profile() {
+export default function Profile({navigation}) {
   const [userPosts,setuserPosts]=useState(null)
   const [ActiveTab,setActiveTab]=useState(true)
-
-  function leftPress() {
-    console.log('Left Pressed');
-  }
 
   getUserData=()=>{
     axios.get(`${BASE_URL}/user`, { headers: { 'app-id': APP_ID } })
@@ -42,27 +35,23 @@ export default function Profile() {
           .finally(() => console.log('Posts Loaded!!!'))
   }
 
-  function rightPress() {
-    console.log('Right Pressed');
-  }
-
-  useEffect(()=>getUserData())
+  useEffect(()=>{getUserData()},[])
 
   return (
-    <View style={{backgroundColor:'white'}}>
+    <View style={{flex:1,backgroundColor:'white'}}>
       <View>
-        <Header leftPress={leftPress} rightPress={rightPress}/>
+        <Header/>
       </View>
       <View style={{flexDirection:'row',paddingHorizontal:5,backgroundColor:'white'}}>
         <View style={{flex:1}}>
-          <Image source={{uri:'https://images.unsplash.com/photo-1532384661798-58b53a4fbe37?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'}} style={styles.profileImage} />
+          <Image source={{uri:profilePicture}} style={styles.profileImage} />
         </View>
         <View style={{flex:3,flexDirection:'row',justifyContent:'space-around',alignItems:'flex-end'}}>
           <View style={{justifyContent:'center',alignItems:'center'}}>
             <Text style={{fontWeight:'bold',fontSize:20}}>201</Text>
             <Text style={{color:'gray'}}>Followers</Text>
           </View>
-          <View style={{justifyContent:'center',alignItems:'center'}}>
+          <View style={{justifyContent:'center',alignItems:'center'}}>  
             <Text style={{fontWeight:'bold',fontSize:20}}>350</Text>
             <Text style={{color:'gray'}}>Karma</Text>
           </View>
@@ -83,7 +72,7 @@ export default function Profile() {
         <TouchableOpacity style={styles.editProfileButton} >
           <Text>EDIT PROFILE</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.profileSettings}>
+        <TouchableOpacity style={styles.profileSettings} onPress={()=>navigation.navigate('Settings')}>
           <IonIcon name='ios-settings-outline' size={15} />
         </TouchableOpacity>
       </View>
@@ -103,14 +92,18 @@ export default function Profile() {
               </RectButton>
             </View>
         </View>
-        <View style={{marginTop:5}}>
-          <Text>Hi Bitch</Text>
-          {userPosts==null ? <Text> No posts </Text> : <FlatList
+        <View style={{alignItems:'center',justifyContent:'space-around'}}>
+          {userPosts==null ?  <ActivityIndicator color='#00ff00' size='large' />
+          :<FlatList
             numColumns={3}
             data={userPosts}
+            // pagingEnabled={true}
+            // contentContainerStyle={{flex:1}}
             renderItem={({item}) => {
               return(
-              <Image source={{uri:item.picture}} style={styles.carousel} />
+                <View>
+                  <Image resizeMode="contain" source={{uri:item.picture}} style={{marginHorizontal:2,marginTop:5,height:200,width:115}} />
+                </View>
               )
             }}          
           />}
@@ -199,3 +192,5 @@ const styles = StyleSheet.create({
   }
 
 })
+
+
